@@ -1,0 +1,154 @@
+{
+  "database_type": "PostgreSQL",
+  "tables": {
+    "Users": {
+      "columns": {
+        "user_id": "SERIAL PRIMARY KEY",
+        "username": "VARCHAR(255) UNIQUE NOT NULL",
+        "email": "VARCHAR(255) UNIQUE NOT NULL",
+        "password_hash": "VARCHAR(255) NOT NULL",
+        "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+      },
+      "indexes": [
+        "username",
+        "email"
+      ]
+    },
+    "Teams": {
+      "columns": {
+        "team_id": "SERIAL PRIMARY KEY",
+        "team_name": "VARCHAR(255) UNIQUE NOT NULL"
+      },
+      "indexes": [
+        "team_name"
+      ]
+    },
+    "TeamMembers": {
+      "columns": {
+        "team_member_id": "SERIAL PRIMARY KEY",
+        "user_id": "INT NOT NULL",
+        "team_id": "INT NOT NULL"
+      },
+      "constraints": [
+        "FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE",
+        "FOREIGN KEY (team_id) REFERENCES Teams(team_id) ON DELETE CASCADE"
+      ]
+    },
+    "Tasks": {
+      "columns": {
+        "task_id": "SERIAL PRIMARY KEY",
+        "title": "VARCHAR(255) NOT NULL",
+        "description": "TEXT",
+        "status": "VARCHAR(50) NOT NULL",
+        "priority": "SMALLINT NOT NULL",
+        "due_date": "DATE",
+        "created_by": "INT NOT NULL",
+        "assigned_to": "INT",
+        "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+      },
+      "constraints": [
+        "FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE CASCADE",
+        "FOREIGN KEY (assigned_to) REFERENCES Users(user_id)"
+      ],
+      "indexes": [
+        "title",
+        "status",
+        "priority",
+        "due_date"
+      ]
+    },
+    "TaskProgress": {
+      "columns": {
+        "progress_id": "SERIAL PRIMARY KEY",
+        "task_id": "INT NOT NULL",
+        "progress_status": "VARCHAR(50) NOT NULL",
+        "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+      },
+      "constraints": [
+        "FOREIGN KEY (task_id) REFERENCES Tasks(task_id) ON DELETE CASCADE"
+      ]
+    },
+    "Notifications": {
+      "columns": {
+        "notification_id": "SERIAL PRIMARY KEY",
+        "user_id": "INT NOT NULL",
+        "message": "VARCHAR(255) NOT NULL",
+        "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "is_read": "BOOLEAN DEFAULT FALSE"
+      },
+      "constraints": [
+        "FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE"
+      ],
+      "indexes": [
+        "user_id",
+        "created_at",
+        "is_read"
+      ]
+    },
+    "Reports": {
+      "columns": {
+        "report_id": "SERIAL PRIMARY KEY",
+        "user_id": "INT NOT NULL",
+        "report_data": "JSONB NOT NULL",
+        "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+      },
+      "constraints": [
+        "FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE"
+      ],
+      "indexes": [
+        "created_at"
+      ]
+    }
+  },
+  "relationships": {
+    "Users_Teams": "Many-to-Many between Users and Teams through TeamMembers",
+    "Users_Tasks": "One-to-Many between Users and Tasks for created tasks",
+    "Users_AssignedTasks": "One-to-Many between Users and Tasks for assigned tasks",
+    "Tasks_Progress": "One-to-Many between Tasks and TaskProgress",
+    "Users_Notifications": "One-to-Many between Users and Notifications",
+    "Users_Reports": "One-to-Many between Users and Reports"
+  },
+  "scalability_and_normalization": {
+    "level": "3NF",
+    "explanation": "Each table is designed to eliminate redundancy by keeping related data logically. Foreign keys ensure data integrity and granularity for scalable task, progress, and notification management."
+  },
+  "sample_data_requirements": {
+    "Users": [
+      {
+        "username": "john_doe",
+        "email": "john@example.com",
+        "password_hash": "hashedpassword1"
+      },
+      {
+        "username": "jane_smith",
+        "email": "jane@example.com",
+        "password_hash": "hashedpassword2"
+      }
+    ],
+    "Teams": [
+      {
+        "team_name": "Development"
+      },
+      {
+        "team_name": "Marketing"
+      }
+    ],
+    "Tasks": [
+      {
+        "title": "Implement Login",
+        "status": "To Do",
+        "priority": 2,
+        "created_by": 1,
+        "assigned_to": 2
+      },
+      {
+        "title": "Design Banner",
+        "status": "In Progress",
+        "priority": 1,
+        "created_by": 2,
+        "assigned_to": 1
+      }
+    ]
+  }
+}

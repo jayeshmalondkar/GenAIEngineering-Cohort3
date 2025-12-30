@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<!-- saved from url=(0066)file:///Users/raamraam/Downloads/rag_pipeline_visualization_1.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Pipeline Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .pipeline-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .pipeline-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .pipeline-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .tech-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+            font-size: 0.85em;
+            text-align: left;
+        }
+
+        .pipeline-box.expanded .tech-details {
+            display: block;
+        }
+
+        .tech-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .tech-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tech-list li {
+            padding: 3px 0;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .tech-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+        }
+
+        .expand-hint {
+            font-size: 0.75em;
+            margin-top: 10px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .pipeline-box.source {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .pipeline-box.parser {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .pipeline-box.chunker {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .pipeline-box.embedder {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .pipeline-box.database {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .pipeline-box.query {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+
+        .pipeline-box.retrieval {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+
+        .pipeline-box.generation {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #333;
+        }
+
+        .pipeline-box.deliver {
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            color: #333;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .box-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .box-description {
+            font-size: 0.85em;
+            opacity: 0.95;
+        }
+
+        .combined-pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .pipeline-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .vertical-arrow {
+            font-size: 2em;
+            color: #667eea;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .stage-label {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .pipeline {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .section-title {
+                font-size: 1.4em;
+            }
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 RAG Pipeline Visualization</h1>
+        <div style="text-align: center; color: white; font-size: 1.2em; margin-bottom: 30px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+            💡 Click on any component box to view technologies and techniques
+        </div>
+
+        <!-- Ingestion Pipeline -->
+        <div class="pipeline-section">
+            <div class="section-title">📥 Ingestion Pipeline</div>
+            <div class="pipeline">
+                <div class="pipeline-box source" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Document Source</div>
+                    <div class="box-description">PDFs, Docs, Web Pages</div>
+                    <div class="tech-details">
+                        <div class="tech-title">📄 File Formats:</div>
+                        <ul class="tech-list">
+                            <li>PDF Documents</li>
+                            <li>Word (DOCX)</li>
+                            <li>Text Files (TXT, MD)</li>
+                            <li>HTML/Web Pages</li>
+                            <li>CSV/Excel</li>
+                        </ul>
+                        <div class="tech-title">🔗 Sources:</div>
+                        <ul class="tech-list">
+                            <li>Local File System</li>
+                            <li>S3/Cloud Storage</li>
+                            <li>Web Scraping</li>
+                            <li>APIs</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box parser" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Document Parser</div>
+                    <div class="box-description">Extract &amp; Clean Text</div>
+                    <div class="tech-details">
+                        <div class="tech-title">🛠️ Libraries:</div>
+                        <ul class="tech-list">
+                            <li>PyPDF2 / PDFPlumber</li>
+                            <li>Apache Tika</li>
+                            <li>Unstructured.io</li>
+                            <li>BeautifulSoup</li>
+                            <li>python-docx</li>
+                        </ul>
+                        <div class="tech-title">⚙️ Techniques:</div>
+                        <ul class="tech-list">
+                            <li>OCR (Tesseract)</li>
+                            <li>Text Cleaning</li>
+                            <li>Metadata Extraction</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box chunker" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Document Chunker</div>
+                    <div class="box-description">Split into Segments</div>
+                    <div class="tech-details">
+                        <div class="tech-title">📚 Methods:</div>
+                        <ul class="tech-list">
+                            <li>Fixed-size Chunking</li>
+                            <li>Recursive Splitting</li>
+                            <li>Semantic Chunking</li>
+                            <li>Sentence-based</li>
+                            <li>Paragraph-based</li>
+                        </ul>
+                        <div class="tech-title">🔧 Tools:</div>
+                        <ul class="tech-list">
+                            <li>LangChain TextSplitter</li>
+                            <li>LlamaIndex</li>
+                            <li>Custom Splitters</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box embedder" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Document Embedder</div>
+                    <div class="box-description">Generate Vectors</div>
+                    <div class="tech-details">
+                        <div class="tech-title">🤖 Models:</div>
+                        <ul class="tech-list">
+                            <li>OpenAI Embeddings</li>
+                            <li>Sentence Transformers</li>
+                            <li>Cohere Embed</li>
+                            <li>HuggingFace Models</li>
+                            <li>Google Vertex AI</li>
+                        </ul>
+                        <div class="tech-title">📊 Popular Models:</div>
+                        <ul class="tech-list">
+                            <li>text-embedding-3-large</li>
+                            <li>all-MiniLM-L6-v2</li>
+                            <li>E5-base-v2</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box database" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Vector Database</div>
+                    <div class="box-description">Store Embeddings</div>
+                    <div class="tech-details">
+                        <div class="tech-title">🗄️ Databases:</div>
+                        <ul class="tech-list">
+                            <li>Pinecone</li>
+                            <li>Weaviate</li>
+                            <li>Chroma</li>
+                            <li>FAISS</li>
+                            <li>Milvus</li>
+                            <li>Qdrant</li>
+                        </ul>
+                        <div class="tech-title">🔍 Indexes:</div>
+                        <ul class="tech-list">
+                            <li>HNSW</li>
+                            <li>IVF</li>
+                            <li>Flat Index</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retrieval Pipeline -->
+        <div class="pipeline-section">
+            <div class="section-title">🔍 Retrieval Pipeline</div>
+            <div class="pipeline">
+                <div class="pipeline-box query" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">User Query</div>
+                    <div class="box-description">Input Question</div>
+                    <div class="tech-details">
+                        <div class="tech-title">💬 Input Types:</div>
+                        <ul class="tech-list">
+                            <li>Natural Language</li>
+                            <li>Keywords</li>
+                            <li>Structured Query</li>
+                        </ul>
+                        <div class="tech-title">🔤 Processing:</div>
+                        <ul class="tech-list">
+                            <li>Query Preprocessing</li>
+                            <li>Intent Recognition</li>
+                            <li>Entity Extraction</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box embedder" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Query Embedder</div>
+                    <div class="box-description">Vectorize Query</div>
+                    <div class="tech-details">
+                        <div class="tech-title">🤖 Same as Document Embedder:</div>
+                        <ul class="tech-list">
+                            <li>OpenAI Embeddings</li>
+                            <li>Sentence Transformers</li>
+                            <li>Cohere Embed</li>
+                        </ul>
+                        <div class="tech-title">⚡ Note:</div>
+                        <ul class="tech-list">
+                            <li>Must use same model</li>
+                            <li>Consistent dimensions</li>
+                            <li>Fast inference</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box retrieval" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Similar Chunk Retrieval</div>
+                    <div class="box-description">Find Relevant Docs</div>
+                    <div class="tech-details">
+                        <div class="tech-title">🔍 Search Methods:</div>
+                        <ul class="tech-list">
+                            <li>Cosine Similarity</li>
+                            <li>Euclidean Distance</li>
+                            <li>Dot Product</li>
+                            <li>k-NN Search</li>
+                            <li>ANN (Approximate)</li>
+                        </ul>
+                        <div class="tech-title">🎯 Techniques:</div>
+                        <ul class="tech-list">
+                            <li>Top-K Retrieval</li>
+                            <li>Hybrid Search</li>
+                            <li>Re-ranking</li>
+                            <li>MMR (Diversity)</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box generation" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Response Generation</div>
+                    <div class="box-description">LLM Synthesis</div>
+                    <div class="tech-details">
+                        <div class="tech-title">🧠 LLM Models:</div>
+                        <ul class="tech-list">
+                            <li>GPT-4 / GPT-4o</li>
+                            <li>Claude (Anthropic)</li>
+                            <li>Llama 3</li>
+                            <li>Mixtral</li>
+                            <li>Gemini</li>
+                        </ul>
+                        <div class="tech-title">🔧 Techniques:</div>
+                        <ul class="tech-list">
+                            <li>Prompt Engineering</li>
+                            <li>Context Injection</li>
+                            <li>Temperature Control</li>
+                            <li>Citation Generation</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="pipeline-box deliver" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                    <div class="box-title">Deliver</div>
+                    <div class="box-description">Final Answer</div>
+                    <div class="tech-details">
+                        <div class="tech-title">📤 Output Formats:</div>
+                        <ul class="tech-list">
+                            <li>Text Response</li>
+                            <li>JSON/API</li>
+                            <li>Streaming</li>
+                            <li>Markdown</li>
+                        </ul>
+                        <div class="tech-title">🌐 Interfaces:</div>
+                        <ul class="tech-list">
+                            <li>REST API</li>
+                            <li>WebSocket</li>
+                            <li>Chat UI</li>
+                            <li>Mobile App</li>
+                        </ul>
+                    </div>
+                    <div class="expand-hint">Click to see details</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combined Pipeline -->
+        <div class="pipeline-section">
+            <div class="section-title">🔄 Complete RAG Pipeline</div>
+            
+            <div class="combined-pipeline">
+                <!-- Ingestion Stage -->
+                <div>
+                    <center><div class="stage-label">INGESTION STAGE (Offline)</div></center>
+                    <div class="pipeline-row">
+                        <div class="pipeline-box source" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Document Source</div>
+                            <div class="box-description">Raw Documents</div>
+                            <div class="tech-details">
+                                <div class="tech-title">📄 Formats:</div>
+                                <ul class="tech-list">
+                                    <li>PDF, DOCX, TXT</li>
+                                    <li>HTML, Markdown</li>
+                                    <li>CSV, Excel</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box parser" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Document Parser</div>
+                            <div class="box-description">Text Extraction</div>
+                            <div class="tech-details">
+                                <div class="tech-title">🛠️ Tools:</div>
+                                <ul class="tech-list">
+                                    <li>PyPDF2, PDFPlumber</li>
+                                    <li>Unstructured.io</li>
+                                    <li>Apache Tika</li>
+                                    <li>OCR: Tesseract</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box chunker" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Document Chunker</div>
+                            <div class="box-description">Text Splitting</div>
+                            <div class="tech-details">
+                                <div class="tech-title">📚 Methods:</div>
+                                <ul class="tech-list">
+                                    <li>Fixed-size</li>
+                                    <li>Semantic</li>
+                                    <li>Recursive</li>
+                                    <li>LangChain Splitters</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box embedder" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Document Embedder</div>
+                            <div class="box-description">Vectorization</div>
+                            <div class="tech-details">
+                                <div class="tech-title">🤖 Models:</div>
+                                <ul class="tech-list">
+                                    <li>OpenAI</li>
+                                    <li>Sentence Transformers</li>
+                                    <li>Cohere, HuggingFace</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box database" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Vector Database</div>
+                            <div class="box-description">Storage</div>
+                            <div class="tech-details">
+                                <div class="tech-title">🗄️ Options:</div>
+                                <ul class="tech-list">
+                                    <li>Pinecone, Weaviate</li>
+                                    <li>Chroma, FAISS</li>
+                                    <li>Milvus, Qdrant</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vertical-arrow">↓</div>
+
+                <!-- Retrieval Stage -->
+                <div>
+                    <center><div class="stage-label">RETRIEVAL STAGE (Online)</div></center>
+                    <div class="pipeline-row">
+                        <div class="pipeline-box query" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">User Query</div>
+                            <div class="box-description">Question Input</div>
+                            <div class="tech-details">
+                                <div class="tech-title">💬 Input:</div>
+                                <ul class="tech-list">
+                                    <li>Natural Language</li>
+                                    <li>Keywords</li>
+                                    <li>Intent Recognition</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box embedder" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Query Embedder</div>
+                            <div class="box-description">Query Vector</div>
+                            <div class="tech-details">
+                                <div class="tech-title">🤖 Same Model:</div>
+                                <ul class="tech-list">
+                                    <li>Consistent embedder</li>
+                                    <li>Fast inference</li>
+                                    <li>Same dimensions</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box database" style="border: 3px solid #FFD700;" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Vector Search</div>
+                            <div class="box-description">Similarity Match</div>
+                            <div class="tech-details">
+                                <div class="tech-title">🔍 Algorithms:</div>
+                                <ul class="tech-list">
+                                    <li>Cosine Similarity</li>
+                                    <li>k-NN / ANN</li>
+                                    <li>HNSW Index</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box retrieval" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Retrieved Chunks</div>
+                            <div class="box-description">Relevant Context</div>
+                            <div class="tech-details">
+                                <div class="tech-title">🎯 Techniques:</div>
+                                <ul class="tech-list">
+                                    <li>Top-K Selection</li>
+                                    <li>Re-ranking</li>
+                                    <li>Hybrid Search</li>
+                                    <li>MMR Diversity</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box generation" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">LLM Generation</div>
+                            <div class="box-description">Synthesize Answer</div>
+                            <div class="tech-details">
+                                <div class="tech-title">🧠 Models:</div>
+                                <ul class="tech-list">
+                                    <li>GPT-4, Claude</li>
+                                    <li>Llama 3, Mixtral</li>
+                                    <li>Prompt Engineering</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="pipeline-box deliver" onclick="this.classList.toggle(&#39;expanded&#39;)">
+                            <div class="box-title">Response</div>
+                            <div class="box-description">Final Output</div>
+                            <div class="tech-details">
+                                <div class="tech-title">📤 Delivery:</div>
+                                <ul class="tech-list">
+                                    <li>REST API</li>
+                                    <li>WebSocket</li>
+                                    <li>Chat Interface</li>
+                                    <li>Streaming</li>
+                                </ul>
+                            </div>
+                            <div class="expand-hint">Click to see details</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Technical Information Sections -->
+            <div style="margin-top: 40px; padding: 25px; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <h3 style="color: #667eea; text-align: center; margin-bottom: 30px; font-size: 2em;">📋 Detailed Technical Reference</h3>
+                
+                <!-- Source File Formats -->
+                <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.4em;">📄 Source File Formats</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #f5576c;">
+                            <h5 style="color: #f5576c; margin-bottom: 8px;">PDF (Portable Document Format)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Challenges:</strong> Complex layouts, tables, images, scanned documents<br>
+                                <strong>Text-based PDFs:</strong> Direct text extraction possible<br>
+                                <strong>Image-based PDFs:</strong> Require OCR (Optical Character Recognition)<br>
+                                <strong>Best for:</strong> Reports, research papers, manuals, books
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #4facfe;">
+                            <h5 style="color: #4facfe; margin-bottom: 8px;">DOCX/DOC (Microsoft Word)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Structure:</strong> XML-based format with styles and formatting<br>
+                                <strong>Advantages:</strong> Preserves structure, headings, lists<br>
+                                <strong>Metadata:</strong> Author, creation date, revision history<br>
+                                <strong>Best for:</strong> Business documents, proposals, documentation
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #43e97b;">
+                            <h5 style="color: #43e97b; margin-bottom: 8px;">HTML/Web Pages</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Structure:</strong> DOM tree with semantic tags<br>
+                                <strong>Challenges:</strong> Navigation, ads, dynamic content<br>
+                                <strong>Techniques:</strong> Web scraping, API access, crawling<br>
+                                <strong>Best for:</strong> Knowledge bases, wikis, web articles
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #fa709a;">
+                            <h5 style="color: #fa709a; margin-bottom: 8px;">Markdown (.md)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Format:</strong> Plain text with markup syntax<br>
+                                <strong>Advantages:</strong> Easy to parse, human-readable<br>
+                                <strong>Common in:</strong> GitHub, documentation, README files<br>
+                                <strong>Best for:</strong> Technical documentation, notes
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #30cfd0;">
+                            <h5 style="color: #30cfd0; margin-bottom: 8px;">CSV/Excel (Tabular Data)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Structure:</strong> Rows and columns of data<br>
+                                <strong>Excel features:</strong> Multiple sheets, formulas, formatting<br>
+                                <strong>Processing:</strong> Pandas, openpyxl for structured extraction<br>
+                                <strong>Best for:</strong> Datasets, financial data, logs
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #a8edea;">
+                            <h5 style="color: #667eea; margin-bottom: 8px;">JSON/XML (Structured Data)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>JSON:</strong> Nested key-value pairs, API responses<br>
+                                <strong>XML:</strong> Hierarchical markup, configuration files<br>
+                                <strong>Advantages:</strong> Machine-readable, preserves structure<br>
+                                <strong>Best for:</strong> API data, configurations, structured content
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parser Options -->
+                <div style="margin-bottom: 30px; padding: 20px; background: #e3f2fd; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.4em;">🛠️ Document Parser Options</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #667eea; margin-bottom: 8px;">PyPDF2 &amp; PyMuPDF (fitz)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Type:</strong> Python PDF libraries<br>
+                                <strong>PyPDF2:</strong> Pure Python, basic text extraction<br>
+                                <strong>PyMuPDF:</strong> Faster, better layout preservation<br>
+                                <strong>Use case:</strong> Simple PDF text extraction<br>
+                                <code style="background: #f5f5f5; padding: 2px 5px; border-radius: 3px;">pip install PyPDF2 PyMuPDF</code>
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #667eea; margin-bottom: 8px;">PDFPlumber</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Specialty:</strong> Table extraction from PDFs<br>
+                                <strong>Features:</strong> Visual debugging, coordinate-based extraction<br>
+                                <strong>Advantages:</strong> Handles complex layouts well<br>
+                                <strong>Use case:</strong> PDFs with tables and structured data<br>
+                                <code style="background: #f5f5f5; padding: 2px 5px; border-radius: 3px;">pip install pdfplumber</code>
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #667eea; margin-bottom: 8px;">Apache Tika</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Type:</strong> Java-based content detection and extraction<br>
+                                <strong>Supports:</strong> 1000+ file formats<br>
+                                <strong>Features:</strong> Metadata extraction, language detection<br>
+                                <strong>Use case:</strong> Universal parser for multiple formats<br>
+                                <code style="background: #f5f5f5; padding: 2px 5px; border-radius: 3px;">pip install tika</code>
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #667eea; margin-bottom: 8px;">Unstructured.io</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Type:</strong> Modern document preprocessing library<br>
+                                <strong>Features:</strong> Smart partitioning, element detection<br>
+                                <strong>Supports:</strong> Images, tables, lists, headers<br>
+                                <strong>Use case:</strong> Production RAG pipelines<br>
+                                <code style="background: #f5f5f5; padding: 2px 5px; border-radius: 3px;">pip install unstructured</code>
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #667eea; margin-bottom: 8px;">Tesseract OCR</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Type:</strong> Optical Character Recognition engine<br>
+                                <strong>Use case:</strong> Scanned documents, images with text<br>
+                                <strong>Supports:</strong> 100+ languages<br>
+                                <strong>Integration:</strong> pytesseract wrapper<br>
+                                <code style="background: #f5f5f5; padding: 2px 5px; border-radius: 3px;">pip install pytesseract</code>
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #667eea; margin-bottom: 8px;">BeautifulSoup &amp; Scrapy</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Type:</strong> HTML/XML parsers for web content<br>
+                                <strong>BeautifulSoup:</strong> Simple, great for single pages<br>
+                                <strong>Scrapy:</strong> Full framework for web crawling<br>
+                                <strong>Use case:</strong> Web scraping, documentation sites<br>
+                                <code style="background: #f5f5f5; padding: 2px 5px; border-radius: 3px;">pip install beautifulsoup4 scrapy</code>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chunking Strategies -->
+                <div style="margin-bottom: 30px; padding: 20px; background: #e8f5e9; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.4em;">✂️ Chunking Strategies</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #43e97b; margin-bottom: 8px;">Fixed-Size Chunking</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Split by character/token count<br>
+                                <strong>Chunk size:</strong> 256-512 tokens typical<br>
+                                <strong>Overlap:</strong> 10-20% recommended<br>
+                                <strong>Pros:</strong> Simple, predictable, fast<br>
+                                <strong>Cons:</strong> May break semantic units<br>
+                                <strong>Best for:</strong> Uniform documents, quick prototypes
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #43e97b; margin-bottom: 8px;">Recursive Character Splitting</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Split by separators hierarchically<br>
+                                <strong>Separators:</strong> \n\n → \n → . → space<br>
+                                <strong>Advantage:</strong> Preserves natural boundaries<br>
+                                <strong>LangChain:</strong> RecursiveCharacterTextSplitter<br>
+                                <strong>Best for:</strong> General-purpose text splitting
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #43e97b; margin-bottom: 8px;">Sentence-Based Chunking</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Split by sentence boundaries<br>
+                                <strong>Tools:</strong> NLTK, spaCy, sentence-transformers<br>
+                                <strong>Grouping:</strong> Combine sentences to target size<br>
+                                <strong>Pros:</strong> Maintains semantic coherence<br>
+                                <strong>Best for:</strong> Question-answering systems
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #43e97b; margin-bottom: 8px;">Semantic Chunking</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Use embeddings to find topic boundaries<br>
+                                <strong>Process:</strong> Embed sentences, cluster by similarity<br>
+                                <strong>Advantage:</strong> Respects content structure<br>
+                                <strong>Cost:</strong> More computationally expensive<br>
+                                <strong>Best for:</strong> Complex, diverse documents
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #43e97b; margin-bottom: 8px;">Document-Structure Based</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Split by document elements<br>
+                                <strong>Elements:</strong> Sections, paragraphs, headings<br>
+                                <strong>Markdown:</strong> Split by headers (#, ##, ###)<br>
+                                <strong>HTML:</strong> Split by semantic tags<br>
+                                <strong>Best for:</strong> Structured documentation
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #43e97b; margin-bottom: 8px;">Token-Based Chunking</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Split based on tokenizer output<br>
+                                <strong>Tokenizers:</strong> tiktoken (OpenAI), HuggingFace<br>
+                                <strong>Advantage:</strong> Precise control for model limits<br>
+                                <strong>Use case:</strong> Matching embedding model limits<br>
+                                <strong>Best for:</strong> Production systems with token limits
+                            </p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #43e97b;">
+                        <h5 style="color: #43e97b; margin-bottom: 8px;">💡 Chunking Best Practices</h5>
+                        <ul style="font-size: 0.9em; color: #555; line-height: 1.8; margin-left: 20px;">
+                            <li><strong>Overlap:</strong> Add 10-20% overlap between chunks to avoid losing context at boundaries</li>
+                            <li><strong>Metadata:</strong> Include document title, section, page number with each chunk</li>
+                            <li><strong>Size optimization:</strong> Test different sizes (256, 512, 1024 tokens) for your use case</li>
+                            <li><strong>Preserve structure:</strong> Keep related sentences/paragraphs together</li>
+                            <li><strong>Avoid splitting:</strong> Don't break code blocks, tables, or lists</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Embedding Models -->
+                <div style="margin-bottom: 30px; padding: 20px; background: #fce4ec; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.4em;">🧬 Embedding Models</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #fa709a; margin-bottom: 8px;">OpenAI Embeddings</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>text-embedding-3-large:</strong> 3072 dimensions, best quality<br>
+                                <strong>text-embedding-3-small:</strong> 1536 dims, 5x cheaper<br>
+                                <strong>text-embedding-ada-002:</strong> Legacy, 1536 dims<br>
+                                <strong>Max input:</strong> 8191 tokens<br>
+                                <strong>Pricing:</strong> $0.13/1M tokens (large), $0.02/1M (small)<br>
+                                <strong>Best for:</strong> High-quality, production systems
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #fa709a; margin-bottom: 8px;">Sentence Transformers (SBERT)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>all-MiniLM-L6-v2:</strong> 384 dims, fast &amp; efficient<br>
+                                <strong>all-mpnet-base-v2:</strong> 768 dims, best quality<br>
+                                <strong>multi-qa-MiniLM-L6-cos-v1:</strong> Optimized for QA<br>
+                                <strong>Cost:</strong> Free, self-hosted<br>
+                                <strong>Speed:</strong> Very fast on GPU<br>
+                                <strong>Best for:</strong> Open-source, local deployments
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #fa709a; margin-bottom: 8px;">Cohere Embed</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>embed-english-v3.0:</strong> 1024 dims, optimized<br>
+                                <strong>embed-multilingual-v3.0:</strong> 100+ languages<br>
+                                <strong>Features:</strong> Compression, int8 quantization<br>
+                                <strong>Input types:</strong> search_document, search_query<br>
+                                <strong>Pricing:</strong> $0.10/1M tokens<br>
+                                <strong>Best for:</strong> Multilingual, semantic search
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #fa709a; margin-bottom: 8px;">Google Vertex AI (Gecko)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>textembedding-gecko:</strong> 768 dimensions<br>
+                                <strong>textembedding-gecko-multilingual:</strong> 100+ langs<br>
+                                <strong>Max input:</strong> 3072 tokens<br>
+                                <strong>Features:</strong> Task-specific variants<br>
+                                <strong>Integration:</strong> Google Cloud ecosystem<br>
+                                <strong>Best for:</strong> GCP users, multilingual
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #fa709a; margin-bottom: 8px;">E5 Models (Microsoft)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>e5-base-v2:</strong> 768 dims, strong performance<br>
+                                <strong>e5-large-v2:</strong> 1024 dims, SOTA results<br>
+                                <strong>e5-small-v2:</strong> 384 dims, lightweight<br>
+                                <strong>Training:</strong> Weak supervision at scale<br>
+                                <strong>Cost:</strong> Free, open-source<br>
+                                <strong>Best for:</strong> Research, custom deployments
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #fa709a; margin-bottom: 8px;">BGE Models (BAAI)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>bge-large-en-v1.5:</strong> 1024 dims, top MTEB scores<br>
+                                <strong>bge-base-en-v1.5:</strong> 768 dims, balanced<br>
+                                <strong>bge-m3:</strong> Multilingual, hybrid retrieval<br>
+                                <strong>Features:</strong> Instruction-based, reranking support<br>
+                                <strong>Best for:</strong> Competitive open-source alternative
+                            </p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #fa709a;">
+                        <h5 style="color: #fa709a; margin-bottom: 8px;">📊 Embedding Model Selection Criteria</h5>
+                        <ul style="font-size: 0.9em; color: #555; line-height: 1.8; margin-left: 20px;">
+                            <li><strong>Quality:</strong> Check MTEB leaderboard for benchmark scores</li>
+                            <li><strong>Dimensions:</strong> Higher = more expressive but slower &amp; more storage</li>
+                            <li><strong>Speed:</strong> Important for real-time applications</li>
+                            <li><strong>Cost:</strong> API costs vs self-hosting infrastructure</li>
+                            <li><strong>Language support:</strong> Ensure model supports your languages</li>
+                            <li><strong>Context length:</strong> Must handle your chunk sizes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Chat/LLM Models -->
+                <div style="margin-bottom: 30px; padding: 20px; background: #fff3e0; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.4em;">🤖 LLM Models for Generation</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #ff9800; margin-bottom: 8px;">GPT-4 Family (OpenAI)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>GPT-4o:</strong> 128K context, multimodal, fastest<br>
+                                <strong>GPT-4 Turbo:</strong> 128K context, cheaper than GPT-4<br>
+                                <strong>GPT-4:</strong> 8K context, highest quality<br>
+                                <strong>GPT-3.5-turbo:</strong> 16K context, cost-effective<br>
+                                <strong>Pricing:</strong> $2.50-$60/1M tokens (varies by model)<br>
+                                <strong>Best for:</strong> Complex reasoning, high-quality outputs
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #ff9800; margin-bottom: 8px;">Claude (Anthropic)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Claude 3.5 Sonnet:</strong> 200K context, best balance<br>
+                                <strong>Claude 3 Opus:</strong> 200K context, highest capability<br>
+                                <strong>Claude 3 Haiku:</strong> 200K context, fastest &amp; cheapest<br>
+                                <strong>Features:</strong> Long context, safety-focused<br>
+                                <strong>Pricing:</strong> $3-$15/1M tokens<br>
+                                <strong>Best for:</strong> Long documents, detailed analysis
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #ff9800; margin-bottom: 8px;">Llama 3 (Meta)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Llama-3-70B:</strong> Strong performance, open weights<br>
+                                <strong>Llama-3-8B:</strong> Efficient, good for fine-tuning<br>
+                                <strong>Context:</strong> 8K tokens standard<br>
+                                <strong>License:</strong> Open-source, commercial use allowed<br>
+                                <strong>Cost:</strong> Free to self-host or via providers<br>
+                                <strong>Best for:</strong> Self-hosting, customization
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #ff9800; margin-bottom: 8px;">Mixtral (Mistral AI)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Mixtral-8x7B:</strong> MoE architecture, 32K context<br>
+                                <strong>Mixtral-8x22B:</strong> Larger, better performance<br>
+                                <strong>Features:</strong> Efficient inference, multilingual<br>
+                                <strong>License:</strong> Apache 2.0, open-source<br>
+                                <strong>Speed:</strong> Fast with sparse activation<br>
+                                <strong>Best for:</strong> Cost-effective, multilingual RAG
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #ff9800; margin-bottom: 8px;">Gemini (Google)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Gemini 1.5 Pro:</strong> 1M+ token context!<br>
+                                <strong>Gemini 1.5 Flash:</strong> Fast, efficient variant<br>
+                                <strong>Features:</strong> Multimodal, extremely long context<br>
+                                <strong>Integration:</strong> Google Cloud ecosystem<br>
+                                <strong>Pricing:</strong> Competitive with GPT-4<br>
+                                <strong>Best for:</strong> Extremely long documents
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #ff9800; margin-bottom: 8px;">Command R+ (Cohere)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Command R+:</strong> 128K context, RAG-optimized<br>
+                                <strong>Command R:</strong> Lighter, faster variant<br>
+                                <strong>Features:</strong> Built-in citation, grounded generation<br>
+                                <strong>RAG support:</strong> Native document connectors<br>
+                                <strong>Best for:</strong> Enterprise RAG applications
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Retrieval & Ranking -->
+                <div style="margin-bottom: 30px; padding: 20px; background: #f3e5f5; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.4em;">🎯 Retrieval &amp; Re-ranking Techniques</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">Dense Retrieval (Vector Search)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Semantic similarity via embeddings<br>
+                                <strong>Metrics:</strong> Cosine similarity, dot product, Euclidean<br>
+                                <strong>Algorithms:</strong> k-NN, ANN (HNSW, IVF)<br>
+                                <strong>Pros:</strong> Captures semantic meaning<br>
+                                <strong>Cons:</strong> May miss exact keywords<br>
+                                <strong>Best for:</strong> Conceptual, semantic queries
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">Sparse Retrieval (Keyword Search)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Methods:</strong> BM25, TF-IDF<br>
+                                <strong>BM25:</strong> Best-Match ranking function<br>
+                                <strong>Advantages:</strong> Exact matches, interpretable<br>
+                                <strong>Implementation:</strong> Elasticsearch, OpenSearch<br>
+                                <strong>Pros:</strong> Fast, handles rare terms well<br>
+                                <strong>Best for:</strong> Exact keyword matching
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">Hybrid Search</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Combination:</strong> Dense + Sparse retrieval<br>
+                                <strong>Fusion:</strong> Reciprocal Rank Fusion (RRF)<br>
+                                <strong>Weights:</strong> Typically 0.7 semantic + 0.3 keyword<br>
+                                <strong>Implementation:</strong> Weaviate, Pinecone hybrid<br>
+                                <strong>Advantage:</strong> Best of both worlds<br>
+                                <strong>Best for:</strong> Production systems
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">Cross-Encoder Re-ranking</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Models:</strong> ms-marco-MiniLM, bge-reranker<br>
+                                <strong>Process:</strong> Query + doc → relevance score<br>
+                                <strong>Workflow:</strong> First retrieve top-K, then rerank<br>
+                                <strong>Advantage:</strong> Much more accurate than bi-encoders<br>
+                                <strong>Cost:</strong> Slower, expensive for large K<br>
+                                <strong>Best for:</strong> Final ranking of top candidates
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">Cohere Rerank</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>API:</strong> Rerank-english-v3.0, rerank-multilingual<br>
+                                <strong>Features:</strong> Production-ready, fast<br>
+                                <strong>Input:</strong> Query + up to 1000 documents<br>
+                                <strong>Output:</strong> Relevance scores + ranked list<br>
+                                <strong>Pricing:</strong> $2/1000 searches<br>
+                                <strong>Best for:</strong> Easy plug-and-play reranking
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">MMR (Maximal Marginal Relevance)</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Purpose:</strong> Diversify results, reduce redundancy<br>
+                                <strong>Balance:</strong> Relevance vs diversity<br>
+                                <strong>Lambda:</strong> 0.5 = equal weight to both<br>
+                                <strong>Use case:</strong> Avoid similar chunks<br>
+                                <strong>Implementation:</strong> LangChain, LlamaIndex<br>
+                                <strong>Best for:</strong> Diverse information needs
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">Contextual Compression</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Method:</strong> Extract only relevant parts of chunks<br>
+                                <strong>Tools:</strong> LLM-based extractors<br>
+                                <strong>Process:</strong> Retrieve → compress → feed to LLM<br>
+                                <strong>Advantage:</strong> Reduces token usage<br>
+                                <strong>Use case:</strong> Long documents, token limits<br>
+                                <strong>Best for:</strong> Optimizing context window
+                            </p>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 6px;">
+                            <h5 style="color: #9c27b0; margin-bottom: 8px;">Query Expansion</h5>
+                            <p style="font-size: 0.9em; color: #555; line-height: 1.6;">
+                                <strong>Methods:</strong> Synonyms, related terms, LLM expansion<br>
+                                <strong>Multi-query:</strong> Generate multiple query variations<br>
+                                <strong>HyDE:</strong> Generate hypothetical document, embed it<br>
+                                <strong>Advantage:</strong> Better recall<br>
+                                <strong>Implementation:</strong> LangChain MultiQueryRetriever<br>
+                                <strong>Best for:</strong> Improving retrieval recall
+                            </p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 6px; border-left: 4px solid #9c27b0;">
+                        <h5 style="color: #9c27b0; margin-bottom: 8px;">🏆 Recommended Retrieval Pipeline</h5>
+                        <ol style="font-size: 0.9em; color: #555; line-height: 1.8; margin-left: 20px;">
+                            <li><strong>Initial Retrieval:</strong> Hybrid search (dense + sparse) → get top 50-100 candidates</li>
+                            <li><strong>Re-ranking:</strong> Cross-encoder or Cohere Rerank → narrow to top 5-10</li>
+                            <li><strong>Diversity:</strong> Optional MMR to avoid redundancy</li>
+                            <li><strong>Compression:</strong> Extract only relevant sentences if context is large</li>
+                            <li><strong>Generation:</strong> Feed curated context to LLM</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technology Reference Section -->
+            <div style="margin-top: 40px; padding: 25px; background: #f8f9fa; border-radius: 10px;">
+                <h3 style="color: #667eea; text-align: center; margin-bottom: 20px;">📚 Common RAG Frameworks &amp; Orchestration Tools</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🦜 LangChain</h4>
+                        <p style="font-size: 0.9em; color: #555;">Full-featured framework for building LLM applications with RAG support, chains, and agents</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🦙 LlamaIndex</h4>
+                        <p style="font-size: 0.9em; color: #555;">Data framework specifically designed for RAG with advanced indexing and retrieval strategies</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🌊 Haystack</h4>
+                        <p style="font-size: 0.9em; color: #555;">End-to-end NLP framework with pipeline orchestration for building search and QA systems</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">⚡ Verba</h4>
+                        <p style="font-size: 0.9em; color: #555;">Open-source RAG application built on Weaviate for creating conversational search experiences</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🔥 Embedchain</h4>
+                        <p style="font-size: 0.9em; color: #555;">Framework to create RAG-powered chatbots over any dataset in minutes</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🤗 Transformers</h4>
+                        <p style="font-size: 0.9em; color: #555;">HuggingFace's library providing pre-trained models for embeddings and generation</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluation Metrics Section -->
+            <div style="margin-top: 30px; padding: 25px; background: #fff3cd; border-radius: 10px; border: 2px solid #ffc107;">
+                <h3 style="color: #856404; text-align: center; margin-bottom: 20px;">📊 RAG Evaluation Metrics &amp; Best Practices</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4 style="color: #856404; margin-bottom: 10px;">🎯 Retrieval Quality</h4>
+                        <ul style="color: #333; font-size: 0.9em; line-height: 1.8;">
+                            <li><strong>Recall@K:</strong> % of relevant docs in top K results</li>
+                            <li><strong>Precision@K:</strong> % of retrieved docs that are relevant</li>
+                            <li><strong>MRR:</strong> Mean Reciprocal Rank of first relevant doc</li>
+                            <li><strong>NDCG:</strong> Normalized Discounted Cumulative Gain</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #856404; margin-bottom: 10px;">✅ Generation Quality</h4>
+                        <ul style="color: #333; font-size: 0.9em; line-height: 1.8;">
+                            <li><strong>Faithfulness:</strong> Answer grounded in context</li>
+                            <li><strong>Answer Relevance:</strong> Addresses the question</li>
+                            <li><strong>Context Relevance:</strong> Retrieved docs are useful</li>
+                            <li><strong>BLEU/ROUGE:</strong> Text similarity metrics</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #856404; margin-bottom: 10px;">⚡ Best Practices</h4>
+                        <ul style="color: #333; font-size: 0.9em; line-height: 1.8;">
+                            <li>Optimize chunk size (typically 256-512 tokens)</li>
+                            <li>Add chunk overlap (10-20%)</li>
+                            <li>Include metadata in embeddings</li>
+                            <li>Implement re-ranking for better results</li>
+                            <li>Use hybrid search (vector + keyword)</li>
+                            <li>Monitor and evaluate continuously</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                    <span>Processing Steps</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);"></div>
+                    <span>Storage/Database</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>
+                    <span>User Input</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);"></div>
+                    <span>Final Output</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body></html>

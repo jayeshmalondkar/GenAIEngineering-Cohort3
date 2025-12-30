@@ -1,0 +1,45 @@
+category: Productivity
+description: An AI-powered task management application with smart scheduling and team
+  collaboration features
+key_features:
+- AI-powered task prioritization
+- Smart scheduling with calendar integration
+- Team collaboration and assignment
+- Progress tracking and analytics
+- Voice commands and natural language input
+- Mobile and web applications
+name: TaskMaster Pro
+target_audience: Teams and individuals looking for intelligent task management
+technical_requirements:
+  ai_features:
+  - Natural language processing
+  - Smart scheduling algorithms
+  - Predictive analytics
+  backend:
+  - Python
+  - FastAPI
+  - PostgreSQL
+  frontend:
+  - React
+  - TypeScript
+  - Tailwind CSS
+  integrations:
+  - Google Calendar
+  - Slack
+  - Microsoft Teams
+user_roles:
+- name: Admin
+  permissions:
+  - manage_users
+  - view_analytics
+  - configure_settings
+- name: Team Lead
+  permissions:
+  - assign_tasks
+  - view_team_progress
+  - create_projects
+- name: Member
+  permissions:
+  - create_tasks
+  - update_status
+  - view_assigned_tasks

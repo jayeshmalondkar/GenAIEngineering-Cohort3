@@ -1,0 +1,163 @@
+{
+  "product_name": "TaskMaster Pro",
+  "ui_ux_specification": {
+    "design_system_and_visual_guidelines": {
+      "grid_system": "12-column grid for flexible layout design",
+      "spacing": "8px base increment for consistency"
+    },
+    "component_library": {
+      "headers": {
+        "main_header": {
+          "height": "64px",
+          "background_color": "#00264d",
+          "text_color": "#ffffff",
+          "elements": [
+            "Logo",
+            "Navigation Menu",
+            "User Profile"
+          ]
+        },
+        "section_header": {
+          "height": "48px",
+          "background_color": "#f2f2f2",
+          "text_color": "#333333",
+          "elements": [
+            "Back Button",
+            "Title"
+          ]
+        }
+      },
+      "forms": {
+        "input_fields": {
+          "padding": "12px",
+          "border_radius": "4px",
+          "border": "1px solid #cccccc",
+          "typography": "Body text"
+        },
+        "select_dropdowns": {
+          "padding": "12px",
+          "border_radius": "4px",
+          "border": "1px solid #cccccc",
+          "typography": "Body text"
+        }
+      },
+      "buttons": {
+        "primary_button": {
+          "background_color": "#ff6600",
+          "text_color": "#ffffff",
+          "border_radius": "4px",
+          "padding": "12px 24px",
+          "hover": {
+            "background_color": "#e65c00"
+          }
+        },
+        "secondary_button": {
+          "background_color": "#ffffff",
+          "text_color": "#ff6600",
+          "border_radius": "4px",
+          "padding": "12px 24px",
+          "border": "1px solid #ff6600",
+          "hover": {
+            "background_color": "#f2f2f2"
+          }
+        }
+      }
+    },
+    "page_layouts_and_user_flows": {
+      "dashboard": {
+        "sections": [
+          "Task Progress Bar",
+          "Notifications",
+          "Activity Feed",
+          "Calendar"
+        ],
+        "user_flow": [
+          "Login",
+          "Dashboard",
+          "Task Details",
+          "Generate Report"
+        ]
+      },
+      "task_management": {
+        "sections": [
+          "Task List",
+          "Task Details",
+          "Create/Edit Task Form"
+        ],
+        "user_flow": [
+          "Add Task",
+          "Edit Task",
+          "Assign Task",
+          "Set Due Date"
+        ]
+      },
+      "reporting": {
+        "sections": [
+          "Productivity Chart",
+          "Export Options"
+        ],
+        "user_flow": [
+          "Select Date Range",
+          "Generate Report",
+          "Download CSV"
+        ]
+      }
+    },
+    "responsive_design_considerations": {
+      "breakpoints": {
+        "mobile": "480px",
+        "tablet": "768px",
+        "desktop": "1024px"
+      },
+      "navigation": "Hamburger menu on mobile, horizontal menu on desktop"
+    },
+    "accessibility_requirements": {
+      "text_contrast": "Minimum contrast ratio of 4.5:1",
+      "keyboard_navigation": "All functionality must be accessible via keyboard",
+      "screen_reader_support": "ARIA roles and labels for all interactive elements"
+    },
+    "color_scheme_and_typography": {
+      "primary_colors": {
+        "blue": "#00264d",
+        "orange": "#ff6600",
+        "light_gray": "#f2f2f2"
+      },
+      "typography": {
+        "headings": {
+          "font_family": "Roboto",
+          "font_weight": "bold"
+        },
+        "body": {
+          "font_family": "Roboto",
+          "font_weight": "normal"
+        }
+      }
+    },
+    "user_interaction_patterns": {
+      "hover_states": "Visual feedback on hovered items",
+      "drag_and_drop": "For task reordering in task list",
+      "inline_editing": "Quick edit tasks directly in list view"
+    },
+    "dashboard_and_admin_interfaces": {
+      "admin_dashboard": {
+        "sections": [
+          "User Management",
+          "Team Settings",
+          "Activity Logs"
+        ],
+        "interfaces": [
+          "Add/Remove Users",
+          "Set Permissions",
+          "View Logs"
+        ]
+      },
+      "user_dashboard": {
+        "elements": [
+          "Personal Task Overview",
+          "Upcoming Deadlines",
+          "Performance Metrics"
+        ]
+      }
+    }
+  }
+}

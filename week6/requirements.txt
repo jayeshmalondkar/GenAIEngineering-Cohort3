@@ -1,0 +1,14 @@
+sqlalchemy
+pymysql
+groq
+google-genai
+dotenv
+pandas
+openai
+requests
+sentence-transformers
+hf-xet
+pandasql
+jmespath
+lancedb
+ipykernel

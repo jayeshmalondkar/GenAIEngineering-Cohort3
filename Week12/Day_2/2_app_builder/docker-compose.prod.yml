@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  web:
+    image: generated-app:latest
+    ports:
+      - "8000:80"
+    env_file:
+      - .env.prod
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: taskmaster
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      update_config:
+        delay: 10s
+
+volumes:
+  db_data:

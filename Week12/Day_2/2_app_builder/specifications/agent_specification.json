@@ -1,0 +1,24 @@
+{
+  "agents": [
+    {
+      "name": "DataProcessingAgent",
+      "description": "Processes and validates data based on product requirements",
+      "capabilities": [
+        "data_validation",
+        "processing",
+        "analysis"
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "name": "MainWorkflow",
+      "description": "Primary workflow for the product",
+      "steps": [
+        "input",
+        "process",
+        "output"
+      ]
+    }
+  ]
+}

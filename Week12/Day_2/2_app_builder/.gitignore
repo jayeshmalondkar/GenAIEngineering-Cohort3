@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+.Python
+env/
+venv/
+ENV/
+*.env
+*.env.*
+*.pytest_cache/
+dist/
+build/
+*.egg-info/
+*.egg
+
+# FastAPI logs
+*.log
+
+# Database
+data.db
+*.sqlite3
+
+# pycache and others
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+
+# JavaScript
+node_modules/
+*.log
+*.yarn*
+.next/
+
+# Build
+out/
+dist/
+build/
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Env Files
+.env
